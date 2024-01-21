@@ -67,23 +67,30 @@ class Bot:
 
 
 class ObjectDetectionBot(Bot):
-    def __init__(self, telegram_token_secret_name, telegram_chat_url, s3_bucket_secret_name, sqs_queue_secret_name):
+    def __init__(self, telegram_chat_url):
         # Retrieve sensitive information from AWS Secrets Manager
-        secrets_manager = boto3.client('ezdehar-secret', region_name='eu-west-3')
+        secrets_manager = boto3.client('secretsmanager', region_name='eu-west-3')
 
         telegram_token = self.get_secret('TELEGRAM_TOKEN', secrets_manager)
-        self.s3_bucket_name= self.get_secret('S3_BUCKET_URL', secrets_manager)
+        self.s3_bucket_name = self.get_secret('S3_BUCKET_URL', secrets_manager)
         self.sqs_queue_url = self.get_secret('SQS_QUEUE_NAME', secrets_manager)
 
         super().__init__(telegram_token, telegram_chat_url)
         self.s3 = boto3.client('s3')
         self.sqs = boto3.client('sqs')
 
-
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
+        chat_id = msg['chat']['id']
+        # Welcome message for the first-time user
+        if 'new_chat_member' in msg:
+            new_member = msg['new_chat_member']
+            self.send_text(msg['chat']['id'], f'Welcome, {new_member["first_name"]}! 😊\n'
+                                              'I am here to help you with object detection in images. '
+                                              'Simply send an image, and I *the bot* will process it for you.')
 
-        if self.is_current_msg_photo(msg):
+        elif self.is_current_msg_photo(msg):
+            self.send_text(chat_id, "👍 Great! I received a photo. Analyzing... 🔍")
             photo_path = self.download_user_photo(msg)
 
             # Upload the photo to S3
@@ -93,12 +100,14 @@ class ObjectDetectionBot(Bot):
             # Send a job to the SQS queue
             job_message = {
                 'photo_key': s3_key,
-                'chat_id': msg['chat']['id']
+                'chat_id': chat_id
             }
             self.send_to_sqs(json.dumps(job_message))
 
             # Send a message to the Telegram end-user
-            self.send_text(msg['chat']['id'], 'Your image is being processed. Please wait...')
+            self.send_text(chat_id, '🤖 Your image is being processed. Please wait... ⏳')
+        else:
+            self.send_text(chat_id, "🚫 I can only process photos. Please send me a photo. 📷")
 
     def upload_to_s3(self, local_path, s3_key):
         self.s3.upload_file(local_path, self.s3_bucket_name, s3_key)
@@ -116,9 +125,5 @@ class ObjectDetectionBot(Bot):
             raise
 
 # Example usage:
-telegram_token_secret = 'YOUR_TELEGRAM_TOKEN_SECRET_NAME'
 telegram_chat_url = 'YOUR_TELEGRAM_WEBHOOK_URL'
-s3_bucket_secret = 'YOUR_S3_BUCKET_SECRET_NAME'
-sqs_queue_secret = 'YOUR_SQS_QUEUE_SECRET_NAME'
-
-bot = ObjectDetectionBot(telegram_token_secret, telegram_chat_url, s3_bucket_secret, sqs_queue_secret)
+bot = ObjectDetectionBot(telegram_chat_url)
