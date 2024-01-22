@@ -138,7 +138,3 @@ class ObjectDetectionBot(Bot):
         except Exception as e:
             logger.error(f"Error retrieving secret '{secret_name}': {e}")
             raise
-
-# Example usage:
-telegram_chat_url = 'YOUR_TELEGRAM_WEBHOOK_URL'
-bot = ObjectDetectionBot(telegram_chat_url)
