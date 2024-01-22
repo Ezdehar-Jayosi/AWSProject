@@ -80,37 +80,52 @@ class ObjectDetectionBot(Bot):
         self.sqs = boto3.client('sqs')
 
     def handle_message(self, msg):
-        logger.info(f'Incoming message: {msg}')
-        chat_id = msg['chat']['id']
-        # Welcome message for the first-time user
-        if 'new_chat_member' in msg:
-            new_member = msg['new_chat_member']
-            self.send_text(msg['chat']['id'], f'Welcome, {new_member["first_name"]}! 😊\n'
-                                              'I am here to help you with object detection in images. '
-                                              'Simply send an image, and I *the bot* will process it for you.')
+        try:
+            logger.info(f'Incoming message: {msg}')
+            chat_id = msg['chat']['id']
+            # Welcome message for the first-time user
+            if 'new_chat_member' in msg:
+                new_member = msg['new_chat_member']
+                self.send_text(msg['chat']['id'], f'Welcome, {new_member["first_name"]}! 😊\n'
+                                                  'I am here to help you with object detection in images. '
+                                                  'Simply send an image, and I *the bot* will process it for you.')
 
-        elif self.is_current_msg_photo(msg):
-            self.send_text(chat_id, "👍 Great! I received a photo. Analyzing... 🔍")
-            photo_path = self.download_user_photo(msg)
+            elif self.is_current_msg_photo(msg):
+                self.send_text(chat_id, "👍 Great! I received a photo. Analyzing... 🔍")
+                img_path = self.download_user_photo(msg)
 
-            # Upload the photo to S3
-            s3_key = f'photos/{os.path.basename(photo_path)}'
-            self.upload_to_s3(photo_path, s3_key)
+                # Upload the photo to S3
+                s3_key = f'photos/{os.path.basename(img_path)}'
+                self.upload_to_s3(img_path, s3_key)
 
-            # Send a job to the SQS queue
-            job_message = {
-                'photo_key': s3_key,
-                'chat_id': chat_id
-            }
-            self.send_to_sqs(json.dumps(job_message))
+                # Send a job to the SQS queue
+                job_message = {
+                    'photo_key': img_path,
+                    'chat_id': chat_id
+                }
+                self.send_to_sqs(json.dumps(job_message))
 
-            # Send a message to the Telegram end-user
-            self.send_text(chat_id, '🤖 Your image is being processed. Please wait... ⏳')
-        else:
-            self.send_text(chat_id, "🚫 I can only process photos. Please send me a photo. 📷")
+                # Send a message to the Telegram end-user
+                self.send_text(chat_id, '🤖 Your image is being processed. Please wait... ⏳')
+            else:
+                self.send_text(chat_id, "🚫 I can only process photos. Please send me a photo. 📷")
+        except Exception as e:
+            # Log the exception
+            logger.error(f'Error handling message: {e}')
 
-    def upload_to_s3(self, local_path, s3_key):
-        self.s3.upload_file(local_path, self.s3_bucket_name, s3_key)
+            # Send an error message to the user
+            self.send_text(msg['chat']['id'],
+                           'An error occurred while processing your request. Please try again later.')
+        finally:
+            logger.info('Exiting handle_message.')
+
+    def upload_to_s3(self, img_path, s3_key):
+        try:
+            self.s3.upload_file(img_path, self.s3_bucket_name, os.path.basename(s3_key))
+        except Exception as e:
+            logger.error(f'Error uploading to S3: {e}')
+            raise
+        return os.path.basename(img_path)
 
     def send_to_sqs(self, message_body):
         self.sqs.send_message(QueueUrl=self.sqs_queue_url, MessageBody=message_body)
