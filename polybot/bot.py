@@ -125,7 +125,7 @@ class ObjectDetectionBot(Bot):
         except Exception as e:
             logger.error(f'Error uploading to S3: {e}')
             raise
-        return os.path.basename(img_path)
+        return s3_key
 
     def send_to_sqs(self, message_body):
         self.sqs.send_message(QueueUrl=self.sqs_queue_url, MessageBody=message_body)
@@ -133,7 +133,7 @@ class ObjectDetectionBot(Bot):
     @staticmethod
     def get_secret(secret_name, secrets_manager):
         try:
-            get_secret_value_response = secrets_manager.get_secret_value(SecretId=secret_name)
+            get_secret_value_response = secrets_manager.get_secret_value(SecretId='secret_name')
             return json.loads(get_secret_value_response['SecretString'])['value']
         except Exception as e:
             logger.error(f"Error retrieving secret '{secret_name}': {e}")
