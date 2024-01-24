@@ -68,19 +68,22 @@ def setup_routes():
 
 
 if __name__ == "__main__":
-    # Load TELEGRAM_TOKEN value from Secret Manager
-    secrets_manager = boto3.client('secretsmanager', region_name='eu-west-3')
-    secret_response = secrets_manager.get_secret_value(SecretId='TELEGRAM_TOKEN')
-    TELEGRAM_TOKEN = secret_response['SecretString'].strip()
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name='eu-west-3'
+    )
 
-    # Load other secrets from Secret Manager
-    s3_bucket_response = secrets_manager.get_secret_value(SecretId='BUCKET_NAME')
-    s3_bucket_name = json.loads(s3_bucket_response['SecretString'])['value']
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId='ezdehar-secret'
+        )
+    except ClientError as error:
+        raise error
 
-    sqs_queue_response = secrets_manager.get_secret_value(SecretId='SQS_QUEUE_NAME')
-    sqs_queue_url = json.loads(sqs_queue_response['SecretString'])['value']
-
-    TELEGRAM_APP_URL = os.environ['TELEGRAM_APP_URL']
+    secrets = json.loads(get_secret_value_response['SecretString'])
+    TELEGRAM_TOKEN = secrets['TELEGRAM_TOKEN']
+    TELEGRAM_APP_URL = secrets['TELEGRAM_APP_URL']
 
     DYNAMODB_REGION = 'eu-west-3'
     DYNAMODB_TABLE_NAME = 'ezdehar-table'

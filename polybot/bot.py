@@ -131,10 +131,10 @@ class ObjectDetectionBot(Bot):
         self.sqs.send_message(QueueUrl=self.sqs_queue_url, MessageBody=message_body)
 
     @staticmethod
-    def get_secret(secret_name, secrets_manager):
+    def get_secret(value, secrets_manager):
         try:
-            get_secret_value_response = secrets_manager.get_secret_value(SecretId='secret_name')
+            get_secret_value_response = secrets_manager.get_secret_value(SecretId='ezdehar-secret')
             return json.loads(get_secret_value_response['SecretString'])['value']
         except Exception as e:
-            logger.error(f"Error retrieving secret '{secret_name}': {e}")
+            logger.error(f"Error retrieving secret '{value}': {e}")
             raise
