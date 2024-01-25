@@ -47,8 +47,8 @@ def consume():
 
             # Receives parameters from the message
             message_body = json.loads(message)
-            img_name = message_body['photo_key']
-            chat_id = message_body['chat_id']
+            img_name = message_body.get('image_name')
+            chat_id = message_body.get('chat_id')
            # original_img_path = f'{img_name}'
             original_img_path = download_from_s3(img_name, prediction_id)
 
