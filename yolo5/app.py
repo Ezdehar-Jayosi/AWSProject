@@ -50,6 +50,8 @@ def consume():
             img_name = message_body.get('photo_key')
             chat_id = message_body.get('chat_id')
            # original_img_path = f'{img_name}'
+            logger.info(f'S3 Bucket: {images_bucket}, Image Name: {img_name}')
+
             original_img_path = download_from_s3(img_name, prediction_id)
 
             logger.info(f'prediction: {prediction_id}/{original_img_path}. Download img completed')
