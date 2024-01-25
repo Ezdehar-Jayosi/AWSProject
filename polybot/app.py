@@ -83,6 +83,7 @@ if __name__ == "__main__":
 
     secrets = json.loads(get_secret_value_response['SecretString'])
     TELEGRAM_TOKEN = secrets['TELEGRAM_TOKEN']
+    TELEGRAM_APP_URL = secrets['TELEGRAM_APP_URL']
 
     DYNAMODB_REGION = 'eu-west-3'
     DYNAMODB_TABLE_NAME = 'ezdehar-table'
