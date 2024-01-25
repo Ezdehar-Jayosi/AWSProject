@@ -19,7 +19,7 @@ def get_secret(secret_name):
         logger.error(f"Error retrieving secret '{secret_name}': {e}")
         raise
 
-secrets = get_secret('ezdehar_secret')
+secrets = get_secret('ezdehar-secret')
 
 images_bucket = secrets['BUCKET_NAME']
 queue_name = secrets['SQS_QUEUE_NAME']
