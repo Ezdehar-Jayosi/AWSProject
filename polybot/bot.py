@@ -77,9 +77,9 @@ class ObjectDetectionBot(Bot):
         self.s3_bucket_name = self.get_secret('S3_BUCKET_URL', secrets_manager)
         self.sqs_queue_url = self.get_secret('SQS_QUEUE_NAME', secrets_manager)
 
-        super().__init__(telegram_token, telegram_chat_url)
-        self.s3 = boto3.client('s3')
-        self.sqs = boto3.client('sqs')
+        super().__init__(telegram_token, telegram_chat_url, region_name='eu-west-3')  # Specify the region here
+        self.s3 = boto3.client('s3', region_name='eu-west-3')  # Specify the region here
+        self.sqs = boto3.client('sqs', region_name='eu-west-3')  # Specify the region here
 
     def handle_message(self, msg):
         try:
