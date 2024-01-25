@@ -86,8 +86,7 @@ if __name__ == "__main__":
 
     secrets = json.loads(get_secret_value_response['SecretString'])
     TELEGRAM_TOKEN = secrets['TELEGRAM_TOKEN']
-    TELEGRAM_APP_URL = secrets['TELEGRAM_APP_URL']
-    print
+    TELEGRAM_APP_URL = 'ezdehar-alb-57890755.eu-west-3.elb.amazonaws.com'
     DYNAMODB_REGION = 'eu-west-3'
     DYNAMODB_TABLE_NAME = 'ezdehar-table'
     dynamodb = boto3.resource('dynamodb', region_name=DYNAMODB_REGION)
