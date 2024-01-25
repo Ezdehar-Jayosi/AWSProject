@@ -14,11 +14,13 @@ app = flask.Flask(__name__)
 def setup_routes():
     @app.route('/', methods=['GET'])
     def index():
+        logger.info('Received a GET request on /')
         return 'Ok'
 
     @app.route(f'/{TELEGRAM_TOKEN}/', methods=['POST'])
     def webhook():
         req = request.get_json()
+        logger.info(f"Received a POST request on /{TELEGRAM_TOKEN}/: {req}")
         bot.handle_message(req['message'])
         return 'Ok'
 
@@ -26,7 +28,7 @@ def setup_routes():
     def results():
         try:
             prediction_id = request.args.get('predictionId')
-
+            logger.info(f"Received a GET request on /results/ with predictionId={prediction_id}")
             # Check if prediction_id is provided
             if not prediction_id:
                 return 'Prediction ID not provided', 400
@@ -63,6 +65,7 @@ def setup_routes():
     @app.route(f'/loadTest/', methods=['POST'])
     def load_test():
         req = request.get_json()
+        logger.info(f"Received a POST request on /loadTest/: {req}")
         bot.handle_message(req['message'])
         return 'Ok'
 
@@ -84,7 +87,7 @@ if __name__ == "__main__":
     secrets = json.loads(get_secret_value_response['SecretString'])
     TELEGRAM_TOKEN = secrets['TELEGRAM_TOKEN']
     TELEGRAM_APP_URL = secrets['TELEGRAM_APP_URL']
-
+    print
     DYNAMODB_REGION = 'eu-west-3'
     DYNAMODB_TABLE_NAME = 'ezdehar-table'
     dynamodb = boto3.resource('dynamodb', region_name=DYNAMODB_REGION)

@@ -26,9 +26,11 @@ class Bot:
 
     def send_text(self, chat_id, text):
         self.telegram_bot_client.send_message(chat_id, text)
+        logger.info(f'Sent text message to chat_id {chat_id}: {text}')
 
     def send_text_with_quote(self, chat_id, text, quoted_msg_id):
         self.telegram_bot_client.send_message(chat_id, text, reply_to_message_id=quoted_msg_id)
+        logger.info(f'Sent text message to chat_id {chat_id} with quote: {text}')
 
     def is_current_msg_photo(self, msg):
         return 'photo' in msg
@@ -50,7 +52,7 @@ class Bot:
 
         with open(file_info.file_path, 'wb') as photo:
             photo.write(data)
-
+        logger.info(f'Downloaded photo from user with chat_id')
         return file_info.file_path
 
     def send_photo(self, chat_id, img_path):
@@ -61,6 +63,7 @@ class Bot:
             chat_id,
             InputFile(img_path)
         )
+        logger.info(f'Sent photo to chat_id {chat_id}')
 
     def handle_message(self, msg):
         """Bot Main message handler"""
@@ -82,6 +85,10 @@ class ObjectDetectionBot(Bot):
         self.sqs = boto3.client('sqs', region_name='eu-west-3')  # Specify the region here
 
     def handle_message(self, msg):
+        self.send_text(msg['chat']['id'], f'Welcome, {msg["first_name"]}! 😊\n'
+                                          'I am here to help you with object detection in images. '
+                                          'Simply send an image, and I *the bot* will process it for you.')
+
         try:
             logger.info(f'Incoming message: {msg}')
             chat_id = msg['chat']['id']
