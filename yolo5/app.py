@@ -163,7 +163,8 @@ def parse_labels(pred_summary_path):
 
 def store_in_dynamodb(prediction_summary):
     try:
-        boto3.resource('dynamodb').Table('ezdehar-table').put_item(Item=prediction_summary)
+        boto3.resource('dynamodb', region_name='eu-west-3').Table('ezdehar-table').put_item(Item=prediction_summary)
+
     except Exception as e:
         logger.error(f'Error storing in DynamoDB: {e}')
         raise
