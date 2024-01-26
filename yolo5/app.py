@@ -137,15 +137,17 @@ def upload_to_s3(local_path, s3_key):
         print(f"Before upload_to_s3: Local file exists: {os.path.exists(local_path)}")
         print(f"Local directory exists: {os.path.exists(local_directory)}")
 
+        # Join directory and file name
+        local_file_path = local_directory / local_path.name
+
         # Upload the file to S3
-        boto3.client('s3').upload_file(str(local_path), images_bucket, s3_key)
+        boto3.client('s3').upload_file(str(local_file_path), images_bucket, s3_key)
 
         # Debug print
-        print(f"After upload_to_s3: Local file exists: {os.path.exists(local_path)}")
+        print(f"After upload_to_s3: Local file exists: {os.path.exists(local_file_path)}")
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
         raise
-
 
 
 
