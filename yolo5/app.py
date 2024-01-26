@@ -24,7 +24,7 @@ secrets = get_secret('ezdehar-secret')
 
 images_bucket = secrets['BUCKET_NAME']
 queue_name = secrets['SQS_QUEUE_NAME']
-polybot_url = 'ezdehar-alb-57890755.eu-west-3.elb.amazonaws.com'  # Replace with the actual ALB URL of Polybot
+polybot_url = 'https://ezdehar-alb-57890755.eu-west-3.elb.amazonaws.com'  # Replace with the actual ALB URL of Polybot
 
 sqs_client = boto3.client('sqs', region_name='eu-west-3')
 
