@@ -184,8 +184,13 @@ def store_in_dynamodb(prediction_summary):
 
 def send_results_to_polybot(prediction_summary):
     try:
-        response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},verify=False)
-       # response.raise_for_status()
+        headers = {'Content-Type': 'application/json'}  # Add any other headers as needed
+        print("Request Headers:", headers)  # Add this line to print headers
+
+        response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},
+                                headers=headers, verify=False)
+
+        # response.raise_for_status()
         if response.status_code == 200:
             logger.info("GET request to bot was successful.")
             # logger.info("Response:", get_response.json())
