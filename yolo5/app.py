@@ -117,14 +117,17 @@ def download_from_s3(img_name, prediction_id):
 
 
 
-
-
 def upload_to_s3(local_path, s3_key):
     try:
+        # Ensure 'predicted_images' directory exists locally
+        predicted_images_directory = Path("predicted_images")
+        predicted_images_directory.mkdir(parents=True, exist_ok=True)
+
         boto3.client('s3').upload_file(local_path, images_bucket, s3_key)
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
         raise
+
 
 
 def parse_labels(pred_summary_path):
