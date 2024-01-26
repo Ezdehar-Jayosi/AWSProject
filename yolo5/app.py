@@ -184,7 +184,7 @@ def store_in_dynamodb(prediction_summary):
 
 def send_results_to_polybot(prediction_summary):
     try:
-        response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},verify='/home/ezdehar/PycharmProjects/AWSProject/polybot/YOURPUBLIC.pem')
+        response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},verify=False)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         logger.error(f'Error sending results to Polybot: {e}')
