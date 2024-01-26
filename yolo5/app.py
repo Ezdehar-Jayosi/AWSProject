@@ -187,7 +187,7 @@ def send_results_to_polybot(prediction_summary):
         headers = {'Content-Type': 'application/json'}  # Add any other headers as needed
         print("Request Headers:", headers)  # Add this line to print headers
 
-        response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},
+        response = requests.get(polybot_url + "/results/", params={'predictionId': prediction_summary['prediction_id']},
                                 headers=headers, verify=False)
 
         # response.raise_for_status()
