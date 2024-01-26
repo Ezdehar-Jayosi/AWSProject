@@ -185,7 +185,14 @@ def store_in_dynamodb(prediction_summary):
 def send_results_to_polybot(prediction_summary):
     try:
         response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},verify=False)
-        response.raise_for_status()
+       # response.raise_for_status()
+        if response.status_code == 200:
+            logger.info("GET request to Lanabot was successful.")
+            # logger.info("Response:", get_response.json())
+        else:
+            logger.info("GET request to Lanabot failed.")
+            # logger.info("Status Code:", get_response.status_code)
+
     except requests.exceptions.RequestException as e:
         logger.error(f'Error sending results to Polybot: {e}')
         raise
