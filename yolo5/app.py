@@ -108,40 +108,29 @@ def consume():
 def download_from_s3(img_name, prediction_id):
     # Remove 'photos/' prefix if it exists in img_name
     img_name_without_prefix = img_name[len('photos/'):] if img_name.startswith('photos/') else img_name
-    local_file_path = Path(f'photos/{prediction_id}.jpg')
+    local_directory = Path("photos")
+    local_directory.mkdir(parents=True, exist_ok=True)
+    local_file_path = local_directory / f'{prediction_id}.jpg'
 
     try:
-        # Ensure 'photos' directory exists locally
-        photos_directory = Path("photos")
-        photos_directory.mkdir(parents=True, exist_ok=True)
-
-        # Construct the local file path
-        local_file_path = photos_directory / f'{prediction_id}.jpg'
-
         boto3.client('s3').download_file(images_bucket, img_name_without_prefix, str(local_file_path))
     except Exception as e:
         logger.error(f'Error downloading image from S3: {e}')
         raise
 
-    return str(local_file_path)
-
-
+    return local_file_path
 
 def upload_to_s3(local_path, s3_key):
     try:
-        # Ensure the directory exists locally
-        local_directory = local_path.parent
-        local_directory.mkdir(parents=True, exist_ok=True)
+        local_file_path = Path(local_path)
+        local_directory = local_file_path.parent
 
-        # Join directory and file name
-        local_file_path = local_directory / local_path.name
-
-        # Debug print
-        print(f"Before upload_to_s3: Local file exists: {os.path.exists(local_file_path)}")
-        print(f"Local directory exists: {os.path.exists(local_directory)}")
+        # Debug prints
+        print(f"Before upload_to_s3: Local file exists: {local_file_path.exists()}")
+        print(f"Local directory exists: {local_directory.exists()}")
 
         # Check if the local file exists before attempting the upload
-        if not os.path.exists(local_file_path):
+        if not local_file_path.exists():
             print(f"Local file does not exist: {local_file_path}")
             return
 
@@ -149,11 +138,10 @@ def upload_to_s3(local_path, s3_key):
         boto3.client('s3').upload_file(str(local_file_path), images_bucket, s3_key)
 
         # Debug print
-        print(f"After upload_to_s3: Local file exists: {os.path.exists(local_file_path)}")
+        print(f"After upload_to_s3: Local file exists: {local_file_path.exists()}")
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
         raise
-
 
 
 def parse_labels(pred_summary_path):
