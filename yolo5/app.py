@@ -72,7 +72,13 @@ def consume():
             predicted_img_path = Path(f'static/data/{prediction_id}/{original_img_path}')
 
             # Upload the predicted image to S3 (do not override the original image)
+            # Debug prints
+            print(f"Before upload_to_s3: Local file exists: {os.path.exists(predicted_img_path)}")
+
             upload_to_s3(predicted_img_path, f'predicted_images/{prediction_id}/{original_img_path}')
+
+            # Debug prints
+            print(f"After upload_to_s3: Local file exists: {os.path.exists(predicted_img_path)}")
 
             # Parse prediction labels and create a summary
             pred_summary_path = Path(f'static/data/{prediction_id}/labels/{original_img_path.split(".")[0]}.txt')
