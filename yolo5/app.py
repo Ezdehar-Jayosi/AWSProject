@@ -140,6 +140,11 @@ def upload_to_s3(local_path, s3_key):
         print(f"Before upload_to_s3: Local file exists: {os.path.exists(local_file_path)}")
         print(f"Local directory exists: {os.path.exists(local_directory)}")
 
+        # Check if the local file exists before attempting the upload
+        if not os.path.exists(local_file_path):
+            print(f"Local file does not exist: {local_file_path}")
+            return
+
         # Upload the file to S3
         boto3.client('s3').upload_file(str(local_file_path), images_bucket, s3_key)
 
