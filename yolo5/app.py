@@ -92,6 +92,7 @@ def consume():
 
                 prediction_summary = {
                     'prediction_id': prediction_id,
+                    'chat_id': chat_id,
                     'original_img_path': str(original_img_path),
                     'predicted_img_path': str(predicted_img_path),
                     'labels': labels,
@@ -186,8 +187,8 @@ def send_results_to_polybot(prediction_summary):
     try:
         headers = {'Content-Type': 'application/json'}  # Add any other headers as needed
         print("Request Headers:", headers)  # Add this line to print headers
-
-        response = requests.get(polybot_url + "/results/", params={'predictionId': prediction_summary['prediction_id']},
+        pb_url = polybot_url + '/results/'
+        response = requests.get(pb_url, params={'predictionId': prediction_summary['prediction_id']},
                                 headers=headers, verify=False)
 
         # response.raise_for_status()
