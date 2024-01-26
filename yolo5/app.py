@@ -108,12 +108,16 @@ def download_from_s3(img_name, prediction_id):
         photos_directory = Path("photos")
         photos_directory.mkdir(parents=True, exist_ok=True)
 
+        # Construct the local file path
+        local_file_path = photos_directory / f'{prediction_id}.jpg'
+
         boto3.client('s3').download_file(images_bucket, img_name_without_prefix, str(local_file_path))
     except Exception as e:
         logger.error(f'Error downloading image from S3: {e}')
         raise
 
     return str(local_file_path)
+
 
 
 
@@ -126,11 +130,16 @@ def upload_to_s3(local_path, s3_key):
         local_directory = Path(directory_path)
         local_directory.mkdir(parents=True, exist_ok=True)
 
+        # Ensure the directory exists on S3
+        s3_client = boto3.client('s3')
+        s3_client.put_object(Bucket=images_bucket, Key=f'{directory_path}/')
+
         # Upload the file to S3
-        boto3.client('s3').upload_file(local_path, images_bucket, s3_key)
+        s3_client.upload_file(local_path, images_bucket, s3_key)
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
         raise
+
 
 
 
