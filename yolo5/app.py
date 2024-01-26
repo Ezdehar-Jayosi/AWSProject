@@ -130,11 +130,19 @@ def upload_to_s3(local_path, s3_key):
         local_directory = Path(directory_path)
         local_directory.mkdir(parents=True, exist_ok=True)
 
-        # Ensure the directory exists on S3
+        # Debug print: Check if the local file exists
+        print(f"Local file exists: {os.path.exists(local_path)}")
+
+        # Debug print: Check if the local directory exists
+        print(f"Local directory exists: {local_directory.exists()}")
+
+        # Upload the file to S3
         s3_client = boto3.client('s3')
         s3_client.put_object(Bucket=images_bucket, Key=f'{directory_path}/')
 
-        # Upload the file to S3
+        # Debug print: Check if the local file still exists after creating S3 directory
+        print(f"Local file exists after S3 directory creation: {os.path.exists(local_path)}")
+
         s3_client.upload_file(local_path, images_bucket, s3_key)
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
