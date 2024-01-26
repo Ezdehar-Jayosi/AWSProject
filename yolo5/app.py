@@ -99,18 +99,22 @@ def consume():
 
 
 def download_from_s3(img_name, prediction_id):
+    # Remove 'photos/' prefix if it exists in img_name
+    img_name_without_prefix = img_name[len('photos/'):] if img_name.startswith('photos/') else img_name
     local_file_path = f'photos/{prediction_id}.jpg'
+
     try:
-        # Ensure 'photos' directory exists
+        # Ensure 'photos' directory exists locally
         photos_directory = Path("photos")
         photos_directory.mkdir(parents=True, exist_ok=True)
 
-        boto3.client('s3').download_file(images_bucket, img_name, local_file_path)
+        boto3.client('s3').download_file(images_bucket, img_name_without_prefix, local_file_path)
     except Exception as e:
         logger.error(f'Error downloading image from S3: {e}')
         raise
 
     return local_file_path
+
 
 
 def upload_to_s3(local_path, s3_key):
