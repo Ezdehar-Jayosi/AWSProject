@@ -74,6 +74,7 @@ def consume():
             # Upload the predicted image to S3 (do not override the original image)
             # Debug prints
             print(f"Before upload_to_s3: Local file exists: {os.path.exists(predicted_img_path)}")
+            print(f"Local directory exists: {os.path.exists(predicted_img_path.parent)}")
 
             upload_to_s3(predicted_img_path, f'predicted_images/{prediction_id}/{original_img_path}')
 
@@ -126,33 +127,18 @@ def download_from_s3(img_name, prediction_id):
 
 
 
-
 def upload_to_s3(local_path, s3_key):
     try:
-        # Extract directory path from s3_key
-        directory_path = '/'.join(s3_key.split('/')[:-1])
-
         # Ensure the directory exists locally
-        local_directory = Path(directory_path)
+        local_directory = local_path.parent
         local_directory.mkdir(parents=True, exist_ok=True)
 
-        # Debug print: Check if the local file exists
-        print(f"Local file exists: {os.path.exists(local_path)}")
-
-        # Debug print: Check if the local directory exists
-        print(f"Local directory exists: {local_directory.exists()}")
-
         # Upload the file to S3
-        s3_client = boto3.client('s3')
-        s3_client.put_object(Bucket=images_bucket, Key=f'{directory_path}/')
-
-        # Debug print: Check if the local file still exists after creating S3 directory
-        print(f"Local file exists after S3 directory creation: {os.path.exists(local_path)}")
-
-        s3_client.upload_file(local_path, images_bucket, s3_key)
+        boto3.client('s3').upload_file(str(local_path), images_bucket, s3_key)
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
         raise
+
 
 
 
