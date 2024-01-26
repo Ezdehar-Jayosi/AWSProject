@@ -82,7 +82,7 @@ def consume():
             print(f"After upload_to_s3: Local file exists: {os.path.exists(predicted_img_path)}")
 
             # Parse prediction labels and create a summary
-            pred_summary_path = str(Path(f'static/data/{prediction_id}/labels/{original_img_path.name.split(".")[0]}.txt'))
+            pred_summary_path = Path(f'static/data/{prediction_id}/labels/{original_img_path.name.split(".")[0]}.txt')
 
 
             if pred_summary_path.exists():
@@ -163,7 +163,7 @@ def parse_labels(pred_summary_path):
 
 def store_in_dynamodb(prediction_summary):
     try:
-        boto3.resource('dynamodb', region_name='eu-west-3').Table('ezdehar-table').put_item(Item=prediction_summary)
+        boto3.resource('dynamodb', region_name='eu-west-3').Table('ezdehar-table').put_item(Item=str(prediction_summary))
 
     except Exception as e:
         logger.error(f'Error storing in DynamoDB: {e}')
