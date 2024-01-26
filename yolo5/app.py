@@ -119,14 +119,19 @@ def download_from_s3(img_name, prediction_id):
 
 def upload_to_s3(local_path, s3_key):
     try:
-        # Ensure 'predicted_images' directory exists locally
-        predicted_images_directory = Path("predicted_images")
-        predicted_images_directory.mkdir(parents=True, exist_ok=True)
+        # Extract directory path from s3_key
+        directory_path = '/'.join(s3_key.split('/')[:-1])
 
+        # Ensure the directory exists locally
+        local_directory = Path(directory_path)
+        local_directory.mkdir(parents=True, exist_ok=True)
+
+        # Upload the file to S3
         boto3.client('s3').upload_file(local_path, images_bucket, s3_key)
     except Exception as e:
         logger.error(f'Error uploading to S3: {e}')
         raise
+
 
 
 
