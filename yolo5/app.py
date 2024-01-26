@@ -24,7 +24,7 @@ secrets = get_secret('ezdehar-secret')
 
 images_bucket = secrets['BUCKET_NAME']
 queue_name = secrets['SQS_QUEUE_NAME']
-polybot_url = 'https://ezdehar-alb-57890755.eu-west-3.elb.amazonaws.com'  # Replace with the actual ALB URL of Polybot
+polybot_url = 'https://ezdehar-alb-57890755.eu-west-3.elb.amazonaws.com/results/'  # Replace with the actual ALB URL of Polybot
 
 sqs_client = boto3.client('sqs', region_name='eu-west-3')
 
@@ -188,7 +188,7 @@ def send_results_to_polybot(prediction_summary):
         headers = {'Content-Type': 'application/json'}  # Add any other headers as needed
         print("Request Headers:", headers)  # Add this line to print headers
         pb_url = polybot_url + '/results/'
-        response = requests.get(pb_url, params={'predictionId': prediction_summary['prediction_id']},
+        response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},
                                 headers=headers, verify=False)
 
         # response.raise_for_status()
