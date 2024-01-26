@@ -162,9 +162,19 @@ def parse_labels(pred_summary_path):
     return labels
 
 
+def convert_floats_to_decimal(obj):
+    if isinstance(obj, float):
+        return Decimal(str(obj))
+    elif isinstance(obj, dict):
+        return {key: convert_floats_to_decimal(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_floats_to_decimal(element) for element in obj]
+    return obj
+
+
 def store_in_dynamodb(prediction_summary):
     try:
-        prediction_summary['time'] = Decimal(str(prediction_summary['time']))
+        prediction_summary = convert_floats_to_decimal(prediction_summary)
         boto3.resource('dynamodb', region_name='eu-west-3').Table('ezdehar-table').put_item(Item=prediction_summary)
 
     except Exception as e:
