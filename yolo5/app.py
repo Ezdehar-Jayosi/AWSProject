@@ -82,7 +82,8 @@ def consume():
             print(f"After upload_to_s3: Local file exists: {os.path.exists(predicted_img_path)}")
 
             # Parse prediction labels and create a summary
-            pred_summary_path = Path(f'static/data/{prediction_id}/labels/{str(original_img_path).split(".")[0]}.txt')
+            pred_summary_path = Path(f'static/data/{prediction_id}/labels/{original_img_path.name.split(".")[0]}.txt')
+
 
             if pred_summary_path.exists():
                 labels = parse_labels(pred_summary_path)
