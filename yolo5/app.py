@@ -7,6 +7,7 @@ import os
 import boto3
 import requests
 import json
+from decimal import Decimal
 
 # Retrieve sensitive information from AWS Secrets Manager
 secrets_manager = boto3.client('secretsmanager', region_name='eu-west-3')
@@ -163,6 +164,7 @@ def parse_labels(pred_summary_path):
 
 def store_in_dynamodb(prediction_summary):
     try:
+        prediction_summary['time'] = Decimal(str(prediction_summary['time']))
         boto3.resource('dynamodb', region_name='eu-west-3').Table('ezdehar-table').put_item(Item=prediction_summary)
 
     except Exception as e:
