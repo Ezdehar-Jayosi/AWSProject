@@ -190,7 +190,8 @@ def send_results_to_polybot(prediction_summary):
         pb_url = polybot_url + '/results/'
         response = requests.get(polybot_url, params={'predictionId': prediction_summary['prediction_id']},
                                 headers=headers, verify=False)
-
+        response.raise_for_status()
+        print(f"Response content: {response.content}")
         # response.raise_for_status()
         if response.status_code == 200:
             logger.info("GET request to bot was successful.")
