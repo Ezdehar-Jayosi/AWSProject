@@ -85,7 +85,7 @@ class ObjectDetectionBot(Bot):
         self.sqs = boto3.client('sqs', region_name='eu-west-3')  # Specify the region here
 
     def handle_message(self, msg):
-        self.send_text(msg['chat']['id'], f'Welcome, {msg["first_name"]}! 😊\n'
+        self.send_text(msg['chat']['id'], f'Welcome, {msg['chat']["first_name"]}! 😊\n'
                                           'I am here to help you with object detection in images. '
                                           'Simply send an image, and I *the bot* will process it for you.')
 
@@ -95,7 +95,7 @@ class ObjectDetectionBot(Bot):
             # Welcome message for the first-time user
             if 'new_chat_member' in msg:
                 new_member = msg['new_chat_member']
-                self.send_text(msg['chat']['id'], f'Welcome, {msg["first_name"]}! 😊\n'
+                self.send_text(msg['chat']['id'], f'Welcome, {msg['chat']["first_name"]}! 😊\n'
                                                   'I am here to help you with object detection in images. '
                                                   'Simply send an image, and I *the bot* will process it for you.')
 
