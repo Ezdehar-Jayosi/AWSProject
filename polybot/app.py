@@ -11,6 +11,23 @@ from loguru import logger
 app = flask.Flask(__name__)
 
 
+def format_prediction_results(self, prediction_result):
+    # Extract relevant information from the prediction result
+    prediction_id = prediction_result["prediction_id"]
+    labels = prediction_result["labels"]
+
+    # Create a dictionary to store the count of each detected object
+    object_counts = {}
+
+    # Iterate over each label in the prediction result
+    for label in labels:
+        class_name = label["class"]
+        object_counts[class_name] = object_counts.get(class_name, 0) + 1
+
+    # Convert the object counts dictionary to a formatted string
+    formatted_results = ", ".join(f"{obj}: {count}" for obj, count in object_counts.items())
+
+    return f"Detected objects: {formatted_results}"
 def setup_routes():
     @app.route('/', methods=['GET'])
     def index():
@@ -43,8 +60,8 @@ def setup_routes():
                 return 'No data found for the given Prediction ID', 404
 
             # Extract chat_id and text_results from the DynamoDB result_item
-            chat_id = result_item.get('chat_id', 'default_chat_id')
-            text_results = result_item.get('text_results', 'default_text_results')
+            chat_id = result_item.get('chat_id')
+            text_results = format_prediction_results(result_item)
 
             bot.send_text(chat_id, text_results)
             return 'Results sent successfully'
