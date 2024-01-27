@@ -95,7 +95,7 @@ class ObjectDetectionBot(Bot):
             # Welcome message for the first-time user
             if 'new_chat_member' in msg:
                 new_member = msg['new_chat_member']
-                self.send_text(msg['chat']['id'], f'Welcome, {new_member["first_name"]}! 😊\n'
+                self.send_text(msg['chat']['id'], f'Welcome, {msg["first_name"]}! 😊\n'
                                                   'I am here to help you with object detection in images. '
                                                   'Simply send an image, and I *the bot* will process it for you.')
 
