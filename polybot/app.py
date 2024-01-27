@@ -11,7 +11,7 @@ from loguru import logger
 app = flask.Flask(__name__)
 
 
-def format_prediction_results(self, prediction_result):
+def format_prediction_results(prediction_result):
     # Extract relevant information from the prediction result
     prediction_id = prediction_result["prediction_id"]
     labels = prediction_result["labels"]
