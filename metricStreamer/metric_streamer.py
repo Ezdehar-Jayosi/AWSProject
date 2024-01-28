@@ -1,11 +1,23 @@
+import json
+
 import boto3
 import time
 
 sqs_client = boto3.resource('sqs', region_name='eu-west-3')
 asg_client = boto3.client('autoscaling', region_name='eu-west-3')
+secrets_manager = boto3.client('secretsmanager', region_name='eu-west-3')
 
+def get_secret(secret_name):
+    try:
+        secret_response = secrets_manager.get_secret_value(SecretId=secret_name)
+        return json.loads(secret_response['SecretString'])
+    except Exception as e:
+        print(f"Error retrieving secret '{secret_name}': {e}")
+        raise
+
+secrets = get_secret('ezdehar-secret')
 AUTOSCALING_GROUP_NAME = 'ezdehar-yolo5-asg'
-QUEUE_NAME = 'SQS_QUEUE_NAME'  # Replace with your actual SQS queue name
+QUEUE_NAME = secrets['SQS_QUEUE_NAME']
 NAMESPACE = 'Ezdehar-Metrics'
 METRIC_NAME = 'BacklogPerInstance'
 
