@@ -1,0 +1,18 @@
+
+{
+  "TargetValue": 10,
+  "CustomizedMetricSpecification": {
+    "MetricName": "BacklogPerInstance",
+    "Namespace": "YoloBotEMetrics",
+    "Dimensions": [
+      {
+        "Name": "AutoScalingGroupName",
+        "Value": "ezdehar-yolo5-asg"
+      }
+    ],
+    "Statistic": "Average",
+    "Unit": "Count"
+  },
+  "ScaleInCooldown": 300,
+  "ScaleOutCooldown": 300
+}
